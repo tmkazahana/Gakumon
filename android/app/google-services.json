@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997420411312",
+    "project_id": "gakumon-app",
+    "storage_bucket": "gakumon-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997420411312:android:3514edd97e77ba7b180e75",
+        "android_client_info": {
+          "package_name": "com.example.gakumon_app_01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6kzSQbQPtA8ihusLEOWNTIyW2CXXtnOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
