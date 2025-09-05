@@ -9,7 +9,8 @@ class MonsterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -17,19 +18,23 @@ class MonsterScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // ★戻るボタン
+              
               Align(
                 alignment: Alignment.topLeft,
-                child: SafeArea( // ステータスバーと被らないように
+                child: SafeArea(
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: theme.colorScheme.primary, 
+                      size: 32, 
+                    ),
                     onPressed: () {
-                      Navigator.pop(context); // 前の画面（メニュー）に戻る
+                      Navigator.pop(context);
                     },
                   ),
                 ),
               ),
-              const Spacer(), // 中央寄せのスペース
+              const Spacer(),
 
               Image.asset(
                 'assets/images/logo1.gif',
@@ -39,19 +44,25 @@ class MonsterScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              _buildLatestKnowledgeDisplay(),
+              _buildLatestKnowledgeDisplay(theme),
               const SizedBox(height: 40),
 
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary, 
+                  foregroundColor: theme.colorScheme.onPrimary, 
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const KnowledgeInputScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const KnowledgeInputScreen()),
                   );
                 },
                 child: const Text('知識をあげる'),
               ),
-              const Spacer(), // 中央寄せのスペース
+              const Spacer(),
             ],
           ),
         ),
@@ -59,7 +70,7 @@ class MonsterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLatestKnowledgeDisplay() {
+  Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('knowledge')
@@ -68,15 +79,24 @@ class MonsterScreen extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return CircularProgressIndicator(
+            valueColor:
+                AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+          );
         }
         if (snapshot.hasError) {
-          return const Text('エラーが発生しました');
+          return Text(
+            'エラーが発生しました',
+            style: TextStyle(color: theme.colorScheme.error, fontSize: 20),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Text(
+          return Text(
             'モンスターはまだ空腹だ...',
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(
+              fontSize: 20,
+              color: theme.colorScheme.onBackground,
+            ),
           );
         }
         final latestKnowledge = snapshot.data!.docs.first;
@@ -85,7 +105,10 @@ class MonsterScreen extends StatelessWidget {
 
         return Text(
           '「$text」($genre) を食べた！',
-          style: const TextStyle(fontSize: 20),
+          style: TextStyle(
+            fontSize: 20,
+            color: theme.colorScheme.onBackground,
+          ),
           textAlign: TextAlign.center,
         );
       },

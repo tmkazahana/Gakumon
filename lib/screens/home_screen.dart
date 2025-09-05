@@ -77,11 +77,7 @@ class HomeScreen extends StatelessWidget {
               'assets/images/logo1.gif',
               width: 150,
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'メニュー',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+           
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {

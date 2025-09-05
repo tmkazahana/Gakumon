@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestoreの機能を追加
 
-// 知識入力画面のウィジェット
 class KnowledgeInputScreen extends StatefulWidget {
   const KnowledgeInputScreen({super.key});
 
@@ -14,23 +13,20 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
   String? _selectedGenre = 'プログラミング';
   final List<String> _genres = ['プログラミング', 'デザイン', 'マーケティング', '語学', 'その他'];
 
-  // ★ ボタンが押されたときの処理をasyncに変更
   Future<void> _feedMonster() async {
     final text = _textController.text;
     final genre = _selectedGenre ?? 'その他';
 
     if (text.isEmpty) {
-      return; // テキストが空なら何もしない
+      return;
     }
 
-    // ★ ここでFirestoreにデータを保存する
     await FirebaseFirestore.instance.collection('knowledge').add({
-      'text': text, // 入力された知識
-      'genre': genre, // 選択されたジャンル
-      'timestamp': FieldValue.serverTimestamp(), // 保存した日時
+      'text': text,
+      'genre': genre,
+      'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // 保存が終わったら、ホーム画面に戻る
     if (mounted) {
       Navigator.pop(context);
     }
@@ -38,10 +34,13 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('知識の入力'),
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: theme.colorScheme.primary, 
+        foregroundColor: theme.colorScheme.onPrimary, 
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,15 +77,13 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
             const SizedBox(height: 30),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: theme.colorScheme.primary, 
+                foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
+                textStyle: const TextStyle(fontSize: 16),
               ),
-              // ★ ボタンが押されたら_feedMonsterを実行
               onPressed: _feedMonster,
-              child: const Text(
-                'モンスターに食べさせる！',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
+              child: const Text('モンスターに食べさせる！'),
             ),
           ],
         ),
