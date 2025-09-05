@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'monster_screen.dart';
+import 'book_screen.dart';
+import 'stomach_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,7 +12,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -28,7 +30,10 @@ class HomeScreen extends StatelessWidget {
               title: const Text('図鑑'),
               onTap: () {
                 Navigator.pop(context); // ドロワーを閉じる
-                // TODO: 図鑑ページへ遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BookScreen()),
+                );
               },
             ),
             ListTile(
@@ -36,7 +41,10 @@ class HomeScreen extends StatelessWidget {
               title: const Text('胃'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 胃ページへ遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StomachScreen()),
+                );
               },
             ),
             ListTile(
@@ -44,31 +52,36 @@ class HomeScreen extends StatelessWidget {
               title: const Text('設定'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: 設定ページへ遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                );
               },
             ),
           ],
         ),
       ),
-      // --- AppBar ---
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-       
         iconTheme: IconThemeData(
-          size: 36, 
+          size: 36,
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      // --- Body ---
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               'assets/images/logo1.gif',
-              width: 200,
-            ),                      
+              width: 150,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'メニュー',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
