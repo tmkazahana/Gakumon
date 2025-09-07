@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         elevation: 0,
         actions: [
           IconButton(
-            iconSize: 36,
+            iconSize: 45,
             color: Theme.of(context).colorScheme.primary,
             icon: AnimatedIcon(
               icon: AnimatedIcons.menu_close,
