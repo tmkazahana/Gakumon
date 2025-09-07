@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'monster_screen.dart';
 import 'book_screen.dart';
-import 'stomach_screen.dart';
+import 'timer_screen.dart';
 import 'settings_screen.dart';
+import 'stomach_screen.dart'; 
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -29,7 +30,7 @@ class HomeScreen extends StatelessWidget {
               leading: const Icon(Icons.book),
               title: const Text('図鑑'),
               onTap: () {
-                Navigator.pop(context); // ドロワーを閉じる
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const BookScreen()),
@@ -37,13 +38,13 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.restaurant), // 仮の胃アイコン
-              title: const Text('胃'),
+              leading: const Icon(Icons.timer),
+              title: const Text('タイマー'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const StomachScreen()),
+                  MaterialPageRoute(builder: (context) => const TimerScreen()),
                 );
               },
             ),
@@ -69,18 +70,34 @@ class HomeScreen extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+      
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/logo1.gif',
-              width: 150,
+            // 1. タップできるばけもの画像
+            GestureDetector(
+              onTap: () {
+                // タップしたら胃の画面（StomachScreen）に移動
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StomachScreen()),
+                );
+              },
+              child: Image.asset(
+                'assets/images/logo1.gif', 
+                width: 250,
+                height: 250,
+                fit: BoxFit.contain,
+              ),
             ),
-           
-            const SizedBox(height: 40),
+            
+            const SizedBox(height: 40), 
+
+            // 2. 育成画面に行くボタン
             ElevatedButton(
               onPressed: () {
+               
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const MonsterScreen()),
