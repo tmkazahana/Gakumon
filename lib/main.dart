@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'screens/splash_screen.dart';
+import 'screens/creator_splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,9 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ----------------------------------------------------
-    // ★ ここからが新しいパステルカラーの定義です ★
-    // ----------------------------------------------------
+    
     final colorScheme = ColorScheme.light(
       primary: const Color(0xFFAEC6CF),      // メインカラー (パステルブルー)
       secondary: const Color(0xFFFFB6C1),    // アクセントカラー (パステルピンク)
@@ -71,7 +69,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: SplashScreen(),
+      home: CreatorSplashScreen(),
     );
   }
 }

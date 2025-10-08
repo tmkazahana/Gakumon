@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 MaterialPageRoute(builder: (context) => const MonsterScreen()),
               );
             },
-            child: const Text('育成をはじめる', style: TextStyle(fontSize: 18)),
+            child: const Text('育成', style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
