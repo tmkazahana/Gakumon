@@ -1,5 +1,3 @@
-// lib/screens/monster_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'knowledge_input_screen.dart';
@@ -18,15 +16,14 @@ class MonsterScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              
               Align(
                 alignment: Alignment.topLeft,
                 child: SafeArea(
                   child: IconButton(
                     icon: Icon(
                       Icons.arrow_back,
-                      color: theme.colorScheme.primary, 
-                      size: 32, 
+                      color: theme.colorScheme.primary,
+                      size: 32,
                     ),
                     onPressed: () {
                       Navigator.pop(context);
@@ -35,7 +32,6 @@ class MonsterScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-
               Image.asset(
                 'assets/images/logo1.gif',
                 width: 200,
@@ -43,14 +39,12 @@ class MonsterScreen extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 30),
-
               _buildLatestKnowledgeDisplay(theme),
               const SizedBox(height: 40),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary, 
-                  foregroundColor: theme.colorScheme.onPrimary, 
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   textStyle: const TextStyle(fontSize: 18),
                 ),
                 onPressed: () {
@@ -100,7 +94,8 @@ class MonsterScreen extends StatelessWidget {
           );
         }
         final latestKnowledge = snapshot.data!.docs.first;
-        final text = latestKnowledge['text'] as String? ?? 'データなし';
+        
+        final text = latestKnowledge['knowledge'] as String? ?? 'データなし';
         final genre = latestKnowledge['genre'] as String? ?? '不明';
 
         return Text(

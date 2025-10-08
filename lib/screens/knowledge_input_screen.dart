@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestoreの機能を追加
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 
 class KnowledgeInputScreen extends StatefulWidget {
   const KnowledgeInputScreen({super.key});
@@ -22,7 +22,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
     }
 
     await FirebaseFirestore.instance.collection('knowledge').add({
-      'text': text,
+      'knowledge': text, 
       'genre': genre,
       'timestamp': FieldValue.serverTimestamp(),
     });
@@ -39,8 +39,8 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('知識の入力'),
-        backgroundColor: theme.colorScheme.primary, 
-        foregroundColor: theme.colorScheme.onPrimary, 
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,7 +77,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
             const SizedBox(height: 30),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary, 
+                backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 textStyle: const TextStyle(fontSize: 16),
