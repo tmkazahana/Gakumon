@@ -97,5 +97,3 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
     super.dispose();
   }
 }
-
-// test
