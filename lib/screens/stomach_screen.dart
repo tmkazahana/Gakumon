@@ -1,4 +1,4 @@
-//stomach_screen.dart
+// lib/screens/stomach_screen.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -13,17 +13,16 @@ class StomachScreen extends StatefulWidget {
 class _StomachScreenState extends State<StomachScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // 利用可能なジャンルリスト (Firestoreから取得)
   List<String> _availableGenres = []; 
-  // 現在選択中のジャンル ('全て'の場合は全表示)
   String? _selectedGenre; 
-  // ジャンルロード中フラグ
   bool _isLoadingGenres = true; 
+  
+  DateTime _selectedDate = DateTime.now(); 
 
   @override
   void initState() {
     super.initState();
-    _fetchGenres(); // 画面起動時にジャンルをロード
+    _fetchGenres(); 
   }
 
   // monstersコレクションからジャンルをロードするメソッド
@@ -35,14 +34,10 @@ class _StomachScreenState extends State<StomachScreen> {
         fetchedGenres.add(doc.id);
       }
       
-      // 【修正・追加】ジャンルリストと選択ジャンルを更新し、ロードフラグをfalseにする
       if (mounted) {
         setState(() {
-          // 1. ジャンルリストに「全て」を追加し、Firestoreから取得したジャンルを加える
           _availableGenres = ['全て', ...fetchedGenres]; 
-          // 2. 初期選択ジャンルを「全て」（リストの最初の要素）に設定する
           _selectedGenre = _availableGenres.isNotEmpty ? _availableGenres[0] : null; 
-          // 3. ロード完了フラグをfalseにする
           _isLoadingGenres = false;
         });
       }
@@ -51,16 +46,14 @@ class _StomachScreenState extends State<StomachScreen> {
         setState(() {
           _isLoadingGenres = false;
         });
-        // エラーハンドリング
         print('ジャンルロードエラー: $e');
       }
     }
   }
 
-  // 選択されたジャンルに基づいてFirestoreクエリを構築
-  Stream<QuerySnapshot> _getTodaysEntriesStream() {
-    DateTime now = DateTime.now();
-    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+  // 選択された日付とジャンルに基づいてFirestoreクエリを構築
+  Stream<QuerySnapshot> _getSelectedDateEntriesStream() {
+    DateTime startOfDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     DateTime endOfDay = startOfDay.add(const Duration(days: 1));
 
     Query query = _firestore
@@ -68,7 +61,6 @@ class _StomachScreenState extends State<StomachScreen> {
         .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
         .where('timestamp', isLessThan: endOfDay);
         
-    // 【修正・追加】「全て」以外のジャンルが選択されている場合、フィルタリング条件を追加
     if (_selectedGenre != null && _selectedGenre != '全て') {
       query = query.where('genre', isEqualTo: _selectedGenre);
     }
@@ -77,23 +69,90 @@ class _StomachScreenState extends State<StomachScreen> {
         .orderBy('timestamp', descending: true)
         .snapshots();
   }
+  
+  // 日付ピッカーを表示するメソッド
+  Future<void> _pickDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000), 
+      lastDate: DateTime.now(),   
+      locale: const Locale('ja', 'JP'), 
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked; 
+      });
+    }
+  }
+  
+  // 日付選択UIを構築するメソッド
+  Widget _buildDateSelector() {
+    // intl のロケール設定により、このフォーマットが可能になっている
+    String formattedDate = DateFormat('MM月dd日(E)', 'ja').format(_selectedDate);
+    
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final canGoForward = selectedDay.isBefore(today);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            formattedDate,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 18),
+                onPressed: () {
+                  setState(() {
+                    _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.calendar_today, size: 20),
+                onPressed: () => _pickDate(context),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios, size: 18),
+                onPressed: canGoForward
+                    ? () {
+                        setState(() {
+                          _selectedDate = _selectedDate.add(const Duration(days: 1));
+                        });
+                      } 
+                    : null,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // 【修正】ジャンルロード中の場合はローディング表示
     if (_isLoadingGenres) {
       return Scaffold(
-        appBar: AppBar(title: const Text('今日の胃の記録')),
+        appBar: AppBar(title: const Text('胃の記録')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     
-    // ジャンルがロードされた後のメインUI
     return Scaffold(
-      appBar: AppBar(title: const Text('今日の胃の記録')),
+      appBar: AppBar(title: const Text('胃の記録')),
       body: Column(
         children: [
-          // 【追加】ジャンル選択ドロップダウン
+          _buildDateSelector(),
+          const Divider(height: 1, color: Colors.grey),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: DropdownButtonFormField<String>(
@@ -101,9 +160,7 @@ class _StomachScreenState extends State<StomachScreen> {
                 labelText: '表示ジャンル',
                 border: OutlineInputBorder(),
               ),
-              // _selectedGenreは_fetchGenresで初期値（'全て'）が設定されています
               value: _selectedGenre,
-              // _availableGenresをドロップダウンの項目として使用
               items: _availableGenres.map((String genre) {
                 return DropdownMenuItem<String>(
                   value: genre,
@@ -114,23 +171,30 @@ class _StomachScreenState extends State<StomachScreen> {
                 if (newValue != null) {
                   setState(() {
                     _selectedGenre = newValue;
-                    // StreamBuilderが新しいクエリで自動的にリビルドされます
                   });
                 }
               },
             ),
           ),
           
-          // StreamBuilderをExpandedで囲み、残りスペースを占有させる
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: _getTodaysEntriesStream(),
+              stream: _getSelectedDateEntriesStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('エラーが発生しました: ${snapshot.error}'));
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Text(
+                        'データの読み込みに失敗しました。Firestoreの複合インデックス（genre:昇順, timestamp:降順）が有効になっているか確認してください。',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  );
                 }
 
                 final entries = snapshot.data!.docs;
@@ -139,21 +203,20 @@ class _StomachScreenState extends State<StomachScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 【追加】今日の件数サマリー
                     Padding(
                       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
                       child: Text(
-                        '${_selectedGenre == '全て' ? '今日' : '今日の${_selectedGenre}ジャンル'}の記録: ${entryCount}件',
+                        '${DateFormat('MM月dd日').format(_selectedDate)}の${_selectedGenre == '全て' ? '記録' : '${_selectedGenre}ジャンルの記録'}: ${entryCount}件',
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                     
                     Expanded(
                       child: entries.isEmpty
-                          ? const Center(
+                          ? Center(
                                 child: Text(
-                                  '今日の記録はまだありません',
-                                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                                  '${DateFormat('MM月dd日').format(_selectedDate)}の記録はまだありません',
+                                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                                 ),
                               )
                           : ListView.builder(
@@ -161,19 +224,56 @@ class _StomachScreenState extends State<StomachScreen> {
                                 itemBuilder: (context, index) {
                                   var data = entries[index].data() as Map<String, dynamic>;
                                   String content = data['knowledge'] ?? '内容がありません';
-                                  String genre = data['genre'] ?? '不明'; // 記録されたジャンル
+                                  String genre = data['genre'] ?? '不明'; 
                                   
                                   String formattedTime = '';
                                   if (data['timestamp'] != null) {
                                     formattedTime = DateFormat('HH:mm').format((data['timestamp'] as Timestamp).toDate());
                                   }
 
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    child: ListTile(
-                                      title: Text(content),
-                                      // サブタイトルに時刻とジャンルを表示
-                                      subtitle: Text('$formattedTime | ジャンル: $genre'),
+                                  // タイムライン風のレイアウト
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: 50, 
+                                          child: Text(
+                                            formattedTime,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+
+                                        Expanded(
+                                          child: Card(
+                                            margin: EdgeInsets.zero, 
+                                            elevation: 1, 
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(content, style: const TextStyle(fontSize: 16)),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    '#$genre',
+                                                    style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
@@ -185,6 +285,12 @@ class _StomachScreenState extends State<StomachScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: 記録追加画面への遷移処理などを実装
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

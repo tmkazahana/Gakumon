@@ -3,11 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart'; 
+import 'package:flutter_localizations/flutter_localizations.dart'; 
+
 import 'firebase_options.dart';
 import 'screens/creator_splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 日本語ロケールデータの初期化
+  await initializeDateFormatting('ja', null);
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -21,19 +28,33 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     
     final colorScheme = ColorScheme.light(
-      primary: const Color(0xFFAEC6CF),      // メインカラー (パステルブルー)
-      secondary: const Color(0xFFFFB6C1),    // アクセントカラー (パステルピンク)
-      background: const Color(0xFFF0F4F7),  // 背景色 (ごく薄いブルーグレー)
-      surface: Colors.white,                 // カードなどの表面色
-      onPrimary: const Color(0xFF333333),    // primaryカラーの上のテキスト色 (濃いグレー)
-      onSecondary: const Color(0xFF333333),  // secondaryカラーの上のテキスト色 (濃いグレー)
-      onBackground: const Color(0xFF4E5D66),  // 背景の上のテキスト色 (少し青みがかったグレー)
-      onSurface: const Color(0xFF333333),      // surfaceの上のテキスト色 (濃いグレー)
+      primary: const Color(0xFFAEC6CF),
+      secondary: const Color(0xFFFFB6C1),
+      background: const Color(0xFFF0F4F7),
+      surface: Colors.white,
+      onPrimary: const Color(0xFF333333),
+      onSecondary: const Color(0xFF333333),
+      onBackground: const Color(0xFF4E5D66),
+      onSurface: const Color(0xFF333333),
     );
 
     return MaterialApp(
       title: 'がくモン',
       debugShowCheckedModeBanner: false,
+
+      // 【重要】サポートロケールの定義
+      supportedLocales: const [
+        Locale('ja', 'JP'), 
+        Locale('en', 'US'),
+      ],
+
+      // 【重要】ローカライズデリゲートの設定
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,  
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      locale: const Locale('ja', 'JP'), 
 
       theme: ThemeData(
         colorScheme: colorScheme,
