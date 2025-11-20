@@ -35,12 +35,24 @@ class _StomachScreenState extends State<StomachScreen> {
         fetchedGenres.add(doc.id);
       }
       
+      // 【修正・追加】ジャンルリストと選択ジャンルを更新し、ロードフラグをfalseにする
+      if (mounted) {
+        setState(() {
+          // 1. ジャンルリストに「全て」を追加し、Firestoreから取得したジャンルを加える
+          _availableGenres = ['全て', ...fetchedGenres]; 
+          // 2. 初期選択ジャンルを「全て」（リストの最初の要素）に設定する
+          _selectedGenre = _availableGenres.isNotEmpty ? _availableGenres[0] : null; 
+          // 3. ロード完了フラグをfalseにする
+          _isLoadingGenres = false;
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isLoadingGenres = false;
         });
         // エラーハンドリング
+        print('ジャンルロードエラー: $e');
       }
     }
   }
@@ -89,6 +101,7 @@ class _StomachScreenState extends State<StomachScreen> {
                 labelText: '表示ジャンル',
                 border: OutlineInputBorder(),
               ),
+              // _selectedGenreは_fetchGenresで初期値（'全て'）が設定されています
               value: _selectedGenre,
               // _availableGenresをドロップダウンの項目として使用
               items: _availableGenres.map((String genre) {
@@ -138,33 +151,33 @@ class _StomachScreenState extends State<StomachScreen> {
                     Expanded(
                       child: entries.isEmpty
                           ? const Center(
-                              child: Text(
-                                '今日の記録はまだありません',
-                                style: TextStyle(fontSize: 18, color: Colors.grey),
-                              ),
-                            )
+                                child: Text(
+                                  '今日の記録はまだありません',
+                                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                                ),
+                              )
                           : ListView.builder(
-                              itemCount: entryCount,
-                              itemBuilder: (context, index) {
-                                var data = entries[index].data() as Map<String, dynamic>;
-                                String content = data['knowledge'] ?? '内容がありません';
-                                String genre = data['genre'] ?? '不明'; // 記録されたジャンル
-                                
-                                String formattedTime = '';
-                                if (data['timestamp'] != null) {
-                                  formattedTime = DateFormat('HH:mm').format((data['timestamp'] as Timestamp).toDate());
-                                }
+                                itemCount: entryCount,
+                                itemBuilder: (context, index) {
+                                  var data = entries[index].data() as Map<String, dynamic>;
+                                  String content = data['knowledge'] ?? '内容がありません';
+                                  String genre = data['genre'] ?? '不明'; // 記録されたジャンル
+                                  
+                                  String formattedTime = '';
+                                  if (data['timestamp'] != null) {
+                                    formattedTime = DateFormat('HH:mm').format((data['timestamp'] as Timestamp).toDate());
+                                  }
 
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  child: ListTile(
-                                    title: Text(content),
-                                    // サブタイトルに時刻とジャンルを表示
-                                    subtitle: Text('$formattedTime | ジャンル: $genre'),
-                                  ),
-                                );
-                              },
-                            ),
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    child: ListTile(
+                                      title: Text(content),
+                                      // サブタイトルに時刻とジャンルを表示
+                                      subtitle: Text('$formattedTime | ジャンル: $genre'),
+                                    ),
+                                  );
+                                },
+                              ),
                     ),
                   ],
                 );
