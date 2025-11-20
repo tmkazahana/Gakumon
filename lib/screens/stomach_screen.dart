@@ -88,7 +88,7 @@ class _StomachScreenState extends State<StomachScreen> {
   
   // 日付選択UIを構築するメソッド
   Widget _buildDateSelector() {
-    // intl のロケール設定により、このフォーマットが可能になっている
+    // intl のロケール設定により、このフォーマットが可能
     String formattedDate = DateFormat('MM月dd日(E)', 'ja').format(_selectedDate);
     
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);

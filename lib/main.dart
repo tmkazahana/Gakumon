@@ -42,13 +42,13 @@ class MyApp extends StatelessWidget {
       title: 'がくモン',
       debugShowCheckedModeBanner: false,
 
-      // 【重要】サポートロケールの定義
+      // サポートロケールの定義
       supportedLocales: const [
         Locale('ja', 'JP'), 
         Locale('en', 'US'),
       ],
 
-      // 【重要】ローカライズデリゲートの設定
+      //ローカライズデリゲートの設定
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,  
