@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'knowledge_input_screen.dart'; 
 
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
@@ -15,6 +16,10 @@ class _TimerScreenState extends State<TimerScreen> {
   bool _isRunning = false;
   bool _isCountdown = true;
   int _initialCountdownSeconds = 60;
+  
+  // 仮のジャンルリストと初期ジャンル
+  final List<String> _genres = ['プログラミング', 'デザイン', 'ビジネス', 'その他'];
+  final String _initialGenre = 'プログラミング';
 
   @override
   void dispose() {
@@ -76,7 +81,8 @@ class _TimerScreenState extends State<TimerScreen> {
     });
     _resetTimer();
   }
-  // カウントダウン時間設定ダイアログ
+  
+  // カウントダウン時間設定ダイアログ (変更なし)
   Future<void> _showSetTimeDialog() async {
     final initialDuration = Duration(seconds: _initialCountdownSeconds);
     final hController = TextEditingController(text: initialDuration.inHours.toString());
@@ -128,7 +134,7 @@ class _TimerScreenState extends State<TimerScreen> {
     }
   }
 
-  // 時間入力用のTextFieldを作成するヘルパーウィジェット
+  // 時間入力用のTextFieldを作成するヘルパーウィジェット (変更なし)
   Widget _buildTimeInput(TextEditingController controller, String label) {
     return SizedBox(
       width: 60,
@@ -139,6 +145,31 @@ class _TimerScreenState extends State<TimerScreen> {
         textAlign: TextAlign.center,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       ),
+    );
+  }
+  
+  // 新しいメソッド: 知識の入力画面をボトムシートとして表示する
+  void _showKnowledgeInput() {
+    // タイマーが動作している場合、一時停止する
+    if (_isRunning) {
+        _toggleTimer(); 
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // キーボードが表示されたときにシート全体が上に移動するようにする
+      builder: (context) {
+        // キーボードが表示された場合のスペース確保
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: KnowledgeInputScreen(
+            genres: _genres,
+            initialGenre: _initialGenre,
+          ),
+        );
+      },
     );
   }
   
@@ -196,6 +227,12 @@ class _TimerScreenState extends State<TimerScreen> {
             ),
           ],
         ),
+      ),
+      // FABを追加して、知識入力画面を表示する
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showKnowledgeInput, // 知識入力画面の表示メソッドを呼び出す
+        icon: const Icon(Icons.add),
+        label: const Text('知識を記録'),
       ),
     );
   }
