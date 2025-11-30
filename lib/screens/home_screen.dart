@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // 【修正1】ホームタブ（最初の画面）のコンテンツ部分としてメソッドを復活
+  // ホームタブ（最初の画面）のコンテンツ部分としてメソッドを復活
   Widget _buildMainContent() {
     return Stack(
       children: [
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 【修正2】ScaffoldとBottomNavigationBarを含む本来のbuildメソッド
+  //ScaffoldとBottomNavigationBarを含む本来のbuildメソッド
   @override
   Widget build(BuildContext context) {
     // 選択されたインデックスに応じて表示する画面を切り替えるウィジェットを決定
