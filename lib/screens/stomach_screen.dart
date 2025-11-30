@@ -220,64 +220,136 @@ class _StomachScreenState extends State<StomachScreen> {
                                 ),
                               )
                           : ListView.builder(
-                                itemCount: entryCount,
-                                itemBuilder: (context, index) {
-                                  var data = entries[index].data() as Map<String, dynamic>;
-                                  String content = data['knowledge'] ?? '内容がありません';
-                                  String genre = data['genre'] ?? '不明'; 
-                                  
-                                  String formattedTime = '';
-                                  if (data['timestamp'] != null) {
-                                    formattedTime = DateFormat('HH:mm').format((data['timestamp'] as Timestamp).toDate());
-                                  }
+                        itemCount: entryCount,
+                        itemBuilder: (context, index) {
+                          var doc = entries[index];
+                          var data = doc.data() as Map<String, dynamic>;
+                          String content = data['knowledge'] ?? '内容がありません';
+                          String genre = data['genre'] ?? '不明';
+                          
+                          String formattedTime = '';
+                          if (data['timestamp'] != null) {
+                            formattedTime = DateFormat('HH:mm').format((data['timestamp'] as Timestamp).toDate());
+                          }
 
-                                  // タイムライン風のレイアウト
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 50, 
-                                          child: Text(
-                                            formattedTime,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-
-                                        Expanded(
-                                          child: Card(
-                                            margin: EdgeInsets.zero, 
-                                            elevation: 1, 
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(content, style: const TextStyle(fontSize: 16)),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    '#$genre',
-                                                    style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Dismissible(
+                              key: Key(doc.id),
+                              direction: DismissDirection.endToStart, // 右→左スワイプで削除
+                              background: Container(
+                                margin: const EdgeInsets.only(right: 0),
+                                padding: const EdgeInsets.only(right: 16),
+                                alignment: Alignment.centerRight,
+                                color: Colors.red,
+                                child: const Icon(Icons.delete, color: Colors.white),
                               ),
+                              confirmDismiss: (direction) async {
+                                bool? confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('削除確認'),
+                                      content: const Text('この記録を削除しますか？'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () => Navigator.pop(context, false),
+                                            child: const Text('キャンセル')),
+                                        ElevatedButton(
+                                            onPressed: () => Navigator.pop(context, true),
+                                            child: const Text('削除')),
+                                      ],
+                                    );
+                                  },
+                                );
+                                return confirm ?? false;
+                              },
+                              onDismissed: (direction) async {
+                                await _firestore.collection('knowledge').doc(doc.id).delete();
+                              },
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 50,
+                                    child: Text(
+                                      formattedTime,
+                                      style: const TextStyle(
+                                          fontSize: 14, color: Colors.grey, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Card(
+                                      margin: EdgeInsets.zero,
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(content, style: const TextStyle(fontSize: 16)),
+                                            const SizedBox(height: 4),
+                                            Text('#$genre',
+                                                style: TextStyle(
+                                                    fontSize: 12, color: Colors.blue.shade700)),
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                IconButton(
+                                                  icon: const Icon(Icons.edit,
+                                                      size: 20, color: Colors.orange),
+                                                  onPressed: () async {
+                                                    // 編集ダイアログ
+                                                    String? edited = await showDialog<String>(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        TextEditingController controller =
+                                                            TextEditingController(text: content);
+                                                        return AlertDialog(
+                                                          title: const Text('記録を編集'),
+                                                          content: TextField(
+                                                            controller: controller,
+                                                            decoration:
+                                                                const InputDecoration(labelText: '内容'),
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(context),
+                                                                child: const Text('キャンセル')),
+                                                            ElevatedButton(
+                                                                onPressed: () => Navigator.pop(
+                                                                    context, controller.text),
+                                                                child: const Text('保存')),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                    if (edited != null && edited.isNotEmpty) {
+                                                      await _firestore
+                                                          .collection('knowledge')
+                                                          .doc(doc.id)
+                                                          .update({'knowledge': edited});
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          );
+                        },
+                      ),
                     ),
                   ],
                 );

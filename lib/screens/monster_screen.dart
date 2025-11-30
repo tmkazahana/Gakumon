@@ -69,56 +69,97 @@ fetchedGenres.add(doc.id);
     }
   }
 
-  // 既存のメソッドはState内に移動または保持
-  Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
-    // ... 既存のロジック (知識の最新表示 StreamBuilder) ...
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('knowledge')
-          .orderBy('timestamp', descending: true)
-          .limit(1)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-          );
-        }
-        if (snapshot.hasError) {
-          return Text(
-            'エラーが発生しました',
-            style: TextStyle(color: theme.colorScheme.error, fontSize: 20),
-          );
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Text(
-            'モンスターはまだ空腹だ...',
-            style: TextStyle(
-              fontSize: 20,
-              color: theme.colorScheme.onBackground,
-            ),
-          );
-        }
-        final latestKnowledge = snapshot.data!.docs.first;
-        
-        // monster_screen.dart (L.90-93付近)
-        // ドキュメントデータをMapとして取得し、安全にアクセスします
-        final data = latestKnowledge.data() as Map<String, dynamic>?;
+    // monster_screen.dart (L.80付近)
+Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
+  // 今日の日付を取得
+  DateTime today = DateTime.now();
+  DateTime start = DateTime(today.year, today.month, today.day);
+  DateTime end = start.add(const Duration(days: 1));
 
-        // nullチェックとフィールドの存在チェックを安全に行う
-        final text = data?['knowledge'] as String? ?? 'データなし';
-        final genre = data?['genre'] as String? ?? '不明';
+  // knowledgeコレクションの全データをチェックするStreamBuilder
+  return StreamBuilder<QuerySnapshot>(
+    // 全期間のknowledgeデータがあるかチェック (1件取得できればOK)
+    stream: FirebaseFirestore.instance
+        .collection('knowledge')
+        .limit(1) // 存在チェックのため1件のみ
+        .snapshots(),
+    builder: (context, allTimeSnapshot) {
+      // 最初のロード中（全体チェック）
+      if (allTimeSnapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator(
+          valueColor:
+              AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+        );
+      }
+      
+      // 全期間でデータが**全くない**場合（アプリ初回起動時相当）
+      if (!allTimeSnapshot.hasData || allTimeSnapshot.data!.docs.isEmpty) {
         return Text(
-          '「$text」($genre) を食べた！',
+          'モンスターと出会ったばかり！\n何か知識をあげてみよう！', // 👈 初回起動時のメッセージ
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20,
             color: theme.colorScheme.onBackground,
           ),
         );
-      },
-    );
-  }
+      }
+
+      // 全期間でデータが**ある**場合は、今日の最新データを表示するロジックを実行
+      return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('knowledge')
+            .where('timestamp', isGreaterThanOrEqualTo: start)
+            .where('timestamp', isLessThan: end)
+            .orderBy('timestamp', descending: true)
+            .limit(1)
+            .snapshots(),
+        builder: (context, todaySnapshot) {
+          // 今日のデータチェックのロード中
+          if (todaySnapshot.connectionState == ConnectionState.waiting) {
+             return CircularProgressIndicator(
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            );
+          }
+
+          // エラー
+          if (todaySnapshot.hasError) {
+            return Text(
+              'エラーが発生しました',
+              style: TextStyle(color: theme.colorScheme.error, fontSize: 20),
+            );
+          }
+
+          // 今日のデータが無い（＝過去には食べたが、今日はまだ食べていない）
+          if (!todaySnapshot.hasData || todaySnapshot.data!.docs.isEmpty) {
+            return Text(
+              '今日はまだモンスターは何も食べていないよ！', 
+              style: TextStyle(
+                fontSize: 20,
+                color: theme.colorScheme.onBackground,
+              ),
+            );
+          }
+
+          // 今日の最新データを表示
+          final latestKnowledge = todaySnapshot.data!.docs.first;
+          final data = latestKnowledge.data() as Map<String, dynamic>?;
+
+          final text = data?['knowledge'] as String? ?? 'データなし';
+          final genre = data?['genre'] as String? ?? '不明';
+
+          return Text(
+            '「$text」($genre) を食べた！',
+            style: TextStyle(
+              fontSize: 20,
+              color: theme.colorScheme.onBackground,
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
 
   @override
