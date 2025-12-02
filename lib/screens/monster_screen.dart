@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'knowledge_input_screen.dart';
-import 'genre_select_screen.dart'; // 新しく作成した画面をインポート
+import 'genre_select_screen.dart'; 
 
 class MonsterScreen extends StatefulWidget {
   const MonsterScreen({super.key});
@@ -23,12 +23,9 @@ class _MonsterScreenState extends State<MonsterScreen> {
     List<String> fetchedGenres = [];
     for (var doc in querySnapshot.docs) {
       doc.data();
-      // 'genre'フィールドを持つドキュメントからジャンル名を取得（ドキュメントIDでも良いが、汎用性のためフィールドを使用）
-      // monster_screen.dart (L.24-29付近)
-// monstersコレクションでは、ドキュメントIDをジャンル名として使用するのが自然です
-// 知識入力画面（KnowledgeInputScreen）の成長ロジックもドキュメントIDを使用しているため、統一します。
+     
 fetchedGenres.add(doc.id);
-// (注: 元々あったフィールドチェックは不要になります)
+
     }
     // 空のジャンル名や重複を排除
     return fetchedGenres.where((g) => g.isNotEmpty).toSet().toList();
@@ -69,7 +66,7 @@ fetchedGenres.add(doc.id);
     }
   }
 
-    // monster_screen.dart (L.80付近)
+   
 Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
   // 今日の日付を取得
   DateTime today = DateTime.now();
@@ -95,7 +92,7 @@ Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
       // 全期間でデータが**全くない**場合（アプリ初回起動時相当）
       if (!allTimeSnapshot.hasData || allTimeSnapshot.data!.docs.isEmpty) {
         return Text(
-          'モンスターと出会ったばかり！\n何か知識をあげてみよう！', // 👈 初回起動時のメッセージ
+          'モンスターと出会ったばかり！\n何か知識をあげてみよう！',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20,
@@ -104,7 +101,7 @@ Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
         );
       }
 
-      // 全期間でデータが**ある**場合は、今日の最新データを表示するロジックを実行
+      // 全期間でデータがある場合は、今日の最新データを表示するロジックを実行
       return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('knowledge')

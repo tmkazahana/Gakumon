@@ -20,7 +20,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   // 各タブで表示する画面のリスト
-  // 【修正点】_buildMainContent()を呼び出すロジックは build メソッド内に移動します
   final List<Widget> _widgetOptions = const <Widget>[
     // 0: ホーム画面（Placeholderを一時的に入れるか、空のコンテナ）
     // 実際のウィジェットの切り替えは build メソッドで行います

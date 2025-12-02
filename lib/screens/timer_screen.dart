@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'knowledge_input_screen.dart'; 
-// import 'stomach_screen.dart'; // 💡 修正: 不要になったためコメントアウトまたは削除
+
 
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
@@ -21,7 +21,7 @@ class _TimerScreenState extends State<TimerScreen> {
   int _initialCountdownSeconds = 60;
   
   // 仮のジャンルリストと初期ジャンル
-  final List<String> _genres = ['プログラミング', 'デザイン', 'ビジネス', 'その他'];
+  final List<String> _genres = ['プログラミング'];
   final String _initialGenre = 'プログラミング';
 
   @override
@@ -176,7 +176,7 @@ class _TimerScreenState extends State<TimerScreen> {
       _toggleTimer();
     }
     
-    // 💡 修正: 知識入力が成功した（resultが true）場合のみ、SnackBarでメッセージを表示
+    
     if (result == true) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
