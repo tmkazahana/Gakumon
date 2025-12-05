@@ -1,17 +1,19 @@
-// lib/screens/knowledge_input_screen.dart (または該当パス)
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; 
 
 class KnowledgeInputScreen extends StatefulWidget {
   final List<String> genres; 
-  final String initialGenre; 
+  
+ 
   
   const KnowledgeInputScreen({
     super.key, 
     required this.genres, 
-    required this.initialGenre,
+    // required this.initialGenre, 
   });
+
+ 
+  static String? savedGenre; 
 
   @override
   State<KnowledgeInputScreen> createState() => _KnowledgeInputScreenState();
@@ -24,7 +26,13 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedGenre = widget.initialGenre; 
+  
+    // ホーム画面やタイマー画面と同期
+    if (KnowledgeInputScreen.savedGenre != null && widget.genres.contains(KnowledgeInputScreen.savedGenre)) {
+       _selectedGenre = KnowledgeInputScreen.savedGenre;
+    } else if (widget.genres.isNotEmpty) {
+       _selectedGenre = widget.genres.first;
+    }
   }
 
   Future<void> _feedMonster() async {
@@ -82,9 +90,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       return;
     }
 
-
     if (mounted) {
-      // 成功時に true を返して画面を閉じる (このロジックは変更なし)
       Navigator.pop(context, true); 
     }
   }
@@ -129,6 +135,8 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedGenre = newValue;
+                  
+                    KnowledgeInputScreen.savedGenre = newValue;
                   });
                 },
               ),

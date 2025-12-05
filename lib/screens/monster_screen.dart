@@ -1,5 +1,3 @@
-// monster_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'knowledge_input_screen.dart';
@@ -15,17 +13,13 @@ class MonsterScreen extends StatefulWidget {
 class _MonsterScreenState extends State<MonsterScreen> {
   // Firestoreから登録済みのジャンルリストを取得するメソッド
   Future<List<String>> _fetchGenres() async {
-    // 'monsters'コレクションから、ドキュメントをすべて取得
     final querySnapshot = await FirebaseFirestore.instance
         .collection('monsters') 
         .get();
 
     List<String> fetchedGenres = [];
     for (var doc in querySnapshot.docs) {
-      doc.data();
-     
-fetchedGenres.add(doc.id);
-
+       fetchedGenres.add(doc.id);
     }
     // 空のジャンル名や重複を排除
     return fetchedGenres.where((g) => g.isNotEmpty).toSet().toList();
@@ -33,7 +27,6 @@ fetchedGenres.add(doc.id);
 
   // 知識をあげるボタンの処理
   void _onFeedMonsterPressed() async {
-    // ロード中UIを一時的に表示
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     scaffoldMessenger.showSnackBar(
       const SnackBar(content: Text('ジャンル情報を確認中...'), duration: Duration(seconds: 1)),
@@ -41,7 +34,6 @@ fetchedGenres.add(doc.id);
     
     final genres = await _fetchGenres();
     
-    // ロード中UIを非表示
     scaffoldMessenger.hideCurrentSnackBar();
 
     if (context.mounted) {
@@ -52,13 +44,13 @@ fetchedGenres.add(doc.id);
           MaterialPageRoute(builder: (context) => const GenreSelectScreen()),
         );
       } else {
-        // ジャンルが登録されている場合は、知識入力画面へジャンルリストを渡して遷移
+        // ジャンルが登録されている場合は、知識入力画面へ遷移
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => KnowledgeInputScreen(
               genres: genres,
-              initialGenre: genres.first, // 最初のジャンルを初期値として渡す
+            
             ),
           ),
         );
@@ -220,4 +212,3 @@ Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
     );
   }
 }
-

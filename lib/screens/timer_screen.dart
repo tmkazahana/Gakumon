@@ -1,10 +1,11 @@
-// lib/screens/timer_screen.dart (または該当パス)
+// lib/screens/timer_screen.dart
 
 import 'dart:async';
+import 'dart:ui'; // FontFeatureのために必要
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
 import 'knowledge_input_screen.dart'; 
-
 
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
@@ -20,9 +21,31 @@ class _TimerScreenState extends State<TimerScreen> {
   bool _isCountdown = true;
   int _initialCountdownSeconds = 60;
   
-  // 仮のジャンルリストと初期ジャンル
-  final List<String> _genres = ['プログラミング'];
-  final String _initialGenre = 'プログラミング';
+  // Firestoreから取得したジャンルを入れるリスト
+  List<String> _genres = []; 
+
+  @override
+  void initState() {
+    super.initState();
+    // 画面が開いたときに最新のジャンル一覧を取りに行く
+    _fetchGenres();
+  }
+
+  // Firestoreからジャンルを取得する関数
+  Future<void> _fetchGenres() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('monsters').get();
+      final loadedGenres = snapshot.docs.map((doc) => doc.id).toList();
+      
+      if (mounted) {
+        setState(() {
+          _genres = loadedGenres;
+        });
+      }
+    } catch (e) {
+      print('ジャンル取得エラー: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -33,16 +56,10 @@ class _TimerScreenState extends State<TimerScreen> {
   String _formatTime(int totalSeconds) {
     final duration = Duration(seconds: totalSeconds);
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-
     final hours = duration.inHours;
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
-
-    if (hours > 0) {
-      return "$hours:$minutes:$seconds";
-    } else {
-      return "$minutes:$seconds";
-    }
+    return hours > 0 ? "$hours:$minutes:$seconds" : "$minutes:$seconds";
   }
 
   void _toggleTimer() {
@@ -114,9 +131,7 @@ class _TimerScreenState extends State<TimerScreen> {
                 final hours = int.tryParse(hController.text) ?? 0;
                 final minutes = int.tryParse(mController.text) ?? 0;
                 final seconds = int.tryParse(sController.text) ?? 0;
-                
                 final totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
-
                 if (totalSeconds > 0) {
                   Navigator.of(context).pop(totalSeconds);
                 }
@@ -147,16 +162,19 @@ class _TimerScreenState extends State<TimerScreen> {
       ),
     );
   }
-  
-  // 知識の入力画面を表示し、タイマー再開と成功メッセージの表示を行う
-  void _showKnowledgeInput() async { 
-    final wasRunning = _isRunning;
 
-    if (wasRunning) {
-        _toggleTimer(); 
+  // 知識の入力画面を表示
+  void _showKnowledgeInput() async { 
+    // もしジャンル読み込みがまだなら何もしない、または読み込む
+    if (_genres.isEmpty) {
+        await _fetchGenres();
     }
+
+    final wasRunning = _isRunning;
+    if (wasRunning) _toggleTimer(); 
     
-    // ボトムシートの戻り値 (true/false) を受け取る
+    // KnowledgeInputScreen内部で static変数(savedGenre) を見るので、
+    // ホーム画面で選んだジャンルが自動的に初期値になります。
     final result = await showModalBottomSheet( 
       context: context,
       isScrollControlled: true,
@@ -164,18 +182,13 @@ class _TimerScreenState extends State<TimerScreen> {
         return SizedBox(
            height: MediaQuery.of(context).size.height * 0.9, 
            child: KnowledgeInputScreen(
-            genres: _genres,
-            initialGenre: _initialGenre,
+            genres: _genres, 
           ),
         );
       },
     );
 
-    // ボトムシートが閉じた後、元々動作していたなら再開する
-    if (wasRunning) {
-      _toggleTimer();
-    }
-    
+    if (wasRunning) _toggleTimer();
     
     if (result == true) {
       if (mounted) {
@@ -196,7 +209,6 @@ class _TimerScreenState extends State<TimerScreen> {
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: _showSetTimeDialog,
-              tooltip: '時間を設定',
             ),
         ],
       ),
@@ -209,6 +221,7 @@ class _TimerScreenState extends State<TimerScreen> {
               style: const TextStyle(
                 fontSize: 80, 
                 fontWeight: FontWeight.bold,
+                // 数字の横揺れ防止
                 fontFeatures: [FontFeature.tabularFigures()],
                 ),
             ),
@@ -238,6 +251,7 @@ class _TimerScreenState extends State<TimerScreen> {
               ),
             ),
           ],
+          
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
