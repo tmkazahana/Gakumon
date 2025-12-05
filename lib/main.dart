@@ -9,8 +9,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 import 'screens/creator_splash_screen.dart';
 
-import 'screens/settings_screen.dart'; 
-
 
 class ThemeController extends ChangeNotifier {
   // 初期色（元のコードに
