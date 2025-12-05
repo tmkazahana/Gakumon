@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
         // --- 中央のGIFロゴ ---
-        // Stack内でCenterを使うと、リボン下の領域の中央にロゴが配置されます
+        // Stack内でCenterを使うと、リボン下の領域の中央にロゴが配置
         Center(
           child: GestureDetector(
             onTap: () {
