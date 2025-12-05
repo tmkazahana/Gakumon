@@ -173,8 +173,6 @@ class _TimerScreenState extends State<TimerScreen> {
     final wasRunning = _isRunning;
     if (wasRunning) _toggleTimer(); 
     
-    // KnowledgeInputScreen内部で static変数(savedGenre) を見るので、
-    // ホーム画面で選んだジャンルが自動的に初期値になります。
     final result = await showModalBottomSheet( 
       context: context,
       isScrollControlled: true,
