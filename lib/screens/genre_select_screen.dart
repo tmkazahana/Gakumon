@@ -32,7 +32,7 @@ class _GenreSelectScreenState extends State<GenreSelectScreen> {
     _isLoading = true;
   });
 
-  // 入力されたジャンル名を取得（空白は除外）
+  // 入力されたジャンル名を取得
   final genres = _controllers
       .map((c) => c.text.trim())
       .where((text) => text.isNotEmpty)
