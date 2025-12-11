@@ -103,7 +103,7 @@ class _BookScreenState extends State<BookScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('モンスター図鑑'),
+        title: const Text('図鑑'),
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         actions: [
           // デバッグ用ボタン（右上の工具アイコン）

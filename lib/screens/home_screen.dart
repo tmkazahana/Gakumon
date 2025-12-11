@@ -42,11 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // ホームタブ（最初の画面）のコンテンツ部分としてメソッドを復活
   Widget _buildMainContent() {
     return Stack(
       children: [
-        // --- 上部リボン（ヘッダー） ---
+        // 上部リボン（ヘッダー）
         Positioned(
           top: 0,
           left: 0,
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.help_outline), // ヘルプマーク
                     onPressed: () {
-                      // ヘルプダイアログの表示
+                    
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
@@ -96,8 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // --- 中央のGIFロゴ ---
-        // Stack内でCenterを使うと、リボン下の領域の中央にロゴが配置
+  
         Center(
           child: GestureDetector(
             onTap: () {
@@ -115,7 +113,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // --- 右下の知識UPボタン（Floating Action Button） ---
         Positioned(
           right: 20,
           bottom: 20,
@@ -127,8 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             backgroundColor: Theme.of(context).colorScheme.primary,
-            // 育成ボタンのデザインを調整
-            //icon: const Icon(Icons.school, size: 24),
             label: const Text('育成', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
         ),
@@ -136,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  //ScaffoldとBottomNavigationBarを含む本来のbuildメソッド
+  
   @override
   Widget build(BuildContext context) {
     // 選択されたインデックスに応じて表示する画面を切り替えるウィジェットを決定
@@ -173,11 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex, // 現在選択されているタブ
         onTap: _onItemTapped,// タップ時の処理
         
-        // --- デザイン調整 ---
-        type: BottomNavigationBarType.fixed, // ボタンが4つ以上でもレイアウトを固定
-        selectedItemColor: Theme.of(context).colorScheme.primary, // 選択中の色
-        unselectedItemColor: Colors.grey, // 選択されていないときの色
-        showUnselectedLabels: true, // 選択されていなくてもラベルを表示
+        // デザイン調整 
+        type: BottomNavigationBarType.fixed, 
+        selectedItemColor: Theme.of(context).colorScheme.primary, 
+        unselectedItemColor: Colors.grey, 
+        showUnselectedLabels: true, 
       ), 
     );
   }

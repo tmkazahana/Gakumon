@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
-// ★通知サービスをインポート
-// ※もしファイルを lib/screens/ に置いた場合は import 'notification_service.dart'; にしてください
+
 import '../services/notification_service.dart'; 
 
 class KnowledgeInputScreen extends StatefulWidget {
@@ -61,9 +60,8 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       _isEating = true;
     });
 
-    try {
-      // ★追加：復習通知をスケジュール（Firestore保存と並行して行う）
-      // ここで10秒後（デモ用）に通知をセットします
+    try {   
+      
       await NotificationService().scheduleReviewNotification(text, genre);
 
       await Future.wait([
@@ -141,7 +139,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       // Stackを使って、入力画面の上に画像を重ねる
       body: Stack(
         children: [
-          // --- 1. 通常の入力フォーム ---
+          // 1. 通常の入力フォーム 
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
@@ -195,7 +193,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
             ),
           ),
 
-          // --- 2. 食事中のアニメーションオーバーレイ ---
+          // 2. 食事中のアニメーションオーバーレイ 
           if (_isEating)
             Container(
               color: const Color.fromARGB(255, 227, 221, 221).withOpacity(0.5), 
