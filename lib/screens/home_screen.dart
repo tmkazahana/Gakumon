@@ -1,6 +1,8 @@
 // lib/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:intl/intl.dart'; 
 
 import 'monster_screen.dart';
 import 'book_screen.dart';
@@ -18,21 +20,45 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // 現在選択されているタブのインデックス（0が最初のタブ）
   int _selectedIndex = 0;
+  
+  
+  String _birthDate = '';
 
   // 各タブで表示する画面のリスト
   final List<Widget> _widgetOptions = const <Widget>[
-    // 0: ホーム画面（Placeholderを一時的に入れるか、空のコンテナ）
-    // 実際のウィジェットの切り替えは build メソッドで行います
+    // 0: ホーム画面（Stackで構築するためここは空）
     SizedBox.shrink(), 
-    const BookScreen(), // 1: ずかん画面
-    const TimerScreen(),// 2: タイマー画面
-    const SettingsScreen(),// 3: 設定画面
+    BookScreen(), // 1: ずかん画面
+    TimerScreen(),// 2: タイマー画面
+    SettingsScreen(),// 3: 設定画面
   ];
 
   @override
   void initState() {
     super.initState();
-    // 初期化は不要
+    // 起動時に誕生日を読み込む（なければ今日を保存）
+    _initBirthDate();
+  }
+
+  // 誕生日の初期化・読み込み処理
+  Future<void> _initBirthDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    // 保存されている誕生日を取得
+    String? savedDate = prefs.getString('monster_birthday');
+
+    if (savedDate == null) {
+      // データがない場合（＝アプリ初回起動時）、今日の日付を保存
+      final now = DateTime.now();
+      savedDate = DateFormat('yyyy年MM月dd日').format(now);
+      await prefs.setString('monster_birthday', savedDate);
+    }
+
+    // 画面に反映
+    if (mounted) {
+      setState(() {
+        _birthDate = savedDate!;
+      });
+    }
   }
 
   // タブがタップされたときに呼ばれる関数
@@ -74,12 +100,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.help_outline), // ヘルプマーク
                     onPressed: () {
-                    
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: const Text("ヘルプ"),
-                          content: const Text("何歳なん？"),
+                          title: const Text("がくモン情報"), // タイトルも少し変更
+                          // ここに読み込んだ誕生日を表示
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("この子が生まれた日"),
+                              const SizedBox(height: 8),
+                              Text(
+                                _birthDate, // 保存された日付を表示
+                                style: const TextStyle(
+                                  fontSize: 20, 
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                            ],
+                          ),
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -95,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-  
+        // 中央のGIFロゴ
         Center(
           child: GestureDetector(
             onTap: () {
@@ -113,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
+        // 右下の育成ボタン
         Positioned(
           right: 20,
           bottom: 20,
@@ -131,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
     // 選択されたインデックスに応じて表示する画面を切り替えるウィジェットを決定
@@ -140,7 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
         : _widgetOptions.elementAt(_selectedIndex); // それ以外のときはリストから取得
 
     return Scaffold(
-      
       body: Center(
         // 選択されたインデックスに応じて表示する画面を切り替える
         child: currentWidget,
