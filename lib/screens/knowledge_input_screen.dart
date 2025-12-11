@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async'; // Future.delayedのために追加
+import 'dart:async'; 
 
 class KnowledgeInputScreen extends StatefulWidget {
   final List<String> genres;
@@ -20,7 +20,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
   final TextEditingController _textController = TextEditingController();
   String? _selectedGenre;
   
-  // ★追加：食事中かどうかを判定するフラグ
+ 
   bool _isEating = false;
 
   @override
@@ -49,10 +49,10 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       return;
     }
 
-    // キーボードを閉じる
+    
     FocusScope.of(context).unfocus();
 
-    // ★追加：食事モードを開始（画像を表示）
+    // 食事モードを開始（画像を表示）
     setState(() {
       _isEating = true;
     });
@@ -62,7 +62,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       await Future.wait([
         // 1. Firestore処理
         _saveToFirestore(text, genre),
-        // 2. アニメーション用ウェイト（ここで画像の表示時間を調整）
+        // 2. アニメーション用ウェイト(2s)
         Future.delayed(const Duration(seconds: 2)),
       ]);
       
@@ -84,7 +84,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
     }
   }
 
-  // Firestoreへの保存処理を分離（読みやすくするため）
+  // Firestoreへの保存処理を分離
   Future<void> _saveToFirestore(String text, String genre) async {
     // 1. 知識の記録
     await FirebaseFirestore.instance.collection('knowledge').add({
@@ -147,7 +147,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 5,
-                    // 食事中は入力を無効化しても良い
+                   
                     enabled: !_isEating, 
                   ),
                   const SizedBox(height: 20),
