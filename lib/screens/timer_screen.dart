@@ -216,7 +216,7 @@ class _TimerScreenState extends State<TimerScreen> {
         
             // 1. キャラクター画像 (上) 
              Image.asset(
-                'assets/images/learningLogo.jpg', 
+                'assets/images/studyLogo.png', 
                 width: 150, 
                 height: 150,
                 fit: BoxFit.contain,
