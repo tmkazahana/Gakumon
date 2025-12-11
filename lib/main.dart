@@ -11,7 +11,7 @@ import 'screens/creator_splash_screen.dart';
 
 
 class ThemeController extends ChangeNotifier {
-  // 初期色（元のコードに
+  // 初期色
   Color _primaryColor = const Color(0xFFAEC6CF);
   // 初期サブカラー
   Color _secondaryColor = const Color(0xFFFFB6C1);

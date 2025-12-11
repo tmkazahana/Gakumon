@@ -119,7 +119,7 @@ Widget _buildLatestKnowledgeDisplay(ThemeData theme) {
             );
           }
 
-          // 今日のデータが無い（＝過去には食べたが、今日はまだ食べていない）
+          // 今日のデータが無い
           if (!todaySnapshot.hasData || todaySnapshot.data!.docs.isEmpty) {
             return Text(
               '今日はまだモンスターは何も食べていないよ！', 

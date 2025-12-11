@@ -49,8 +49,7 @@ class _GenreSelectScreenState extends State<GenreSelectScreen> {
 
   try {
     final monstersRef = FirebaseFirestore.instance.collection('monsters');
-
-    // --- 既存のジャンルを全て削除 ---
+    
     // 1. 現在の全ドキュメントを取得
     final existingDocs = await monstersRef.get();
     
