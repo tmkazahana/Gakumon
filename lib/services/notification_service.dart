@@ -13,7 +13,11 @@ class NotificationService {
   Future<void> init() async {
     // タイムゾーンの初期化
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Tokyo'));
+    try {
+      tz.setLocalLocation(tz.getLocation('Asia/Tokyo'));
+    } catch (e) {
+      print("タイムゾーン設定エラー（無視可）: $e");
+    }
 
     // Android設定
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -34,9 +38,7 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-    
-    
-    // Android 13以降用
+    // Android 13以降用：通知権限のリクエスト
     final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
         flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
@@ -62,15 +64,11 @@ class NotificationService {
       iOS: DarwinNotificationDetails(),
     );
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    await flutterLocalNotificationsPlugin.show(
       id,
       '復習の時間だよ！($genre)',
       '「$knowledgeText」を覚えていますか？',
-      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10)),
       notificationDetails,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 }
