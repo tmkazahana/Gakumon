@@ -1,7 +1,7 @@
 // lib/screens/timer_screen.dart
 
 import 'dart:async';
-import 'dart:ui'; // FontFeatureのために必要
+import 'dart:ui'; 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
@@ -164,8 +164,7 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   // 知識の入力画面を表示
-  void _showKnowledgeInput() async { 
-    // もしジャンル読み込みがまだなら何もしない、または読み込む
+  void _showKnowledgeInput() async {    
     if (_genres.isEmpty) {
         await _fetchGenres();
     }
@@ -214,16 +213,30 @@ class _TimerScreenState extends State<TimerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+        
+            // 1. キャラクター画像 (上) 
+             Image.asset(
+                'assets/images/learningLogo.jpg', 
+                width: 150, 
+                height: 150,
+                fit: BoxFit.contain,
+              ),
+            
+            const SizedBox(height: 20), 
+
+            // 2. タイマー表示 (下)
             Text(
               _formatTime(_seconds),
               style: const TextStyle(
                 fontSize: 80, 
                 fontWeight: FontWeight.bold,
-                // 数字の横揺れ防止
                 fontFeatures: [FontFeature.tabularFigures()],
-                ),
+              ),
             ),
+            
             const SizedBox(height: 40),
+
+            // 再生・停止・リセットボタン 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
