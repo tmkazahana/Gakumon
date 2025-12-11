@@ -12,6 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  
+  flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
+ 
+
   flutter_localizations: 
     sdk: flutter
   
@@ -38,7 +43,7 @@ flutter:
 
 flutter_launcher_icons:
   android: true
-  ios: 
+  ios: true 
   image_path: "assets/images/Image.png"  
   adaptive_icon_background: "#FFFFFF" 
-  adaptive_icon_foreground: "assets/images/Image.png" 
+  adaptive_icon_foreground: "assets/images/Image.png"

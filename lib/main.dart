@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 import 'screens/creator_splash_screen.dart';
 
+import 'services/notification_service.dart';//通知機能
 
 class ThemeController extends ChangeNotifier {
   // 初期色
@@ -23,7 +24,7 @@ class ThemeController extends ChangeNotifier {
   void changeThemeColor(Color newPrimary, Color newSecondary) {
     _primaryColor = newPrimary;
     _secondaryColor = newSecondary;
-    notifyListeners(); 
+    notifyListeners();
   }
 }
 
@@ -31,12 +32,16 @@ final themeController = ThemeController();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await initializeDateFormatting('ja', null);
-  
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 通知機能を初期化
+  await NotificationService().init();
+
   runApp(const MyApp());
 }
 
@@ -45,15 +50,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return ListenableBuilder(
       listenable: themeController,
       builder: (context, child) {
-        
-      
         final colorScheme = ColorScheme.light(
-          primary: themeController.primaryColor,   
-          secondary: themeController.secondaryColor, 
+          primary: themeController.primaryColor,
+          secondary: themeController.secondaryColor,
           background: const Color(0xFFF0F4F7),
           surface: Colors.white,
           onPrimary: const Color(0xFF333333),
@@ -65,19 +67,16 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'がくモン',
           debugShowCheckedModeBanner: false,
-
           supportedLocales: const [
             Locale('ja', 'JP'),
             Locale('en', 'US'),
           ],
-
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
           locale: const Locale('ja', 'JP'),
-
           theme: ThemeData(
             colorScheme: colorScheme,
             useMaterial3: true,
@@ -101,7 +100,8 @@ class MyApp extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.secondary,
                 foregroundColor: colorScheme.onSecondary,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -112,8 +112,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-         
-          home: const CreatorSplashScreen(), 
+          home: const CreatorSplashScreen(),
         );
       },
     );

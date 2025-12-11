@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:async'; 
+import 'dart:async';
+
+// ★通知サービスをインポート
+// ※もしファイルを lib/screens/ に置いた場合は import 'notification_service.dart'; にしてください
+import '../services/notification_service.dart'; 
 
 class KnowledgeInputScreen extends StatefulWidget {
   final List<String> genres;
@@ -20,7 +24,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
   final TextEditingController _textController = TextEditingController();
   String? _selectedGenre;
   
- 
+  // 食事中かどうかを判定するフラグ
   bool _isEating = false;
 
   @override
@@ -49,7 +53,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
       return;
     }
 
-    
+    // キーボードを閉じる
     FocusScope.of(context).unfocus();
 
     // 食事モードを開始（画像を表示）
@@ -58,7 +62,10 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
     });
 
     try {
-     
+      // ★追加：復習通知をスケジュール（Firestore保存と並行して行う）
+      // ここで10秒後（デモ用）に通知をセットします
+      await NotificationService().scheduleReviewNotification(text, genre);
+
       await Future.wait([
         // 1. Firestore処理
         _saveToFirestore(text, genre),
@@ -131,7 +138,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
-    
+      // Stackを使って、入力画面の上に画像を重ねる
       body: Stack(
         children: [
           // --- 1. 通常の入力フォーム ---
@@ -147,7 +154,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 5,
-                   
+                    // 食事中は入力を無効化
                     enabled: !_isEating, 
                   ),
                   const SizedBox(height: 20),
@@ -198,7 +205,7 @@ class _KnowledgeInputScreenState extends State<KnowledgeInputScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                      Image.asset(
+                    Image.asset(
                       'assets/images/eatingLogo.png', 
                       width: 200,
                       height: 200,
